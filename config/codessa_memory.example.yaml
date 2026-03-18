@@ -1,0 +1,14 @@
+app:
+  name: codessa-memory
+  env: development
+chunking:
+  size: 900
+  overlap: 120
+retrieval:
+  top_k: 5
+storage:
+  backend: local
+  local_dir: .data
+embedding:
+  provider: local
+  model: sentence-transformers/all-MiniLM-L6-v2
