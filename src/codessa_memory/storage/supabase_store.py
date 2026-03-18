@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Any
-
 from codessa_memory.utils.models import ChronoSpiralLog, CodexEntry, QueryResult
 
 
