@@ -10,6 +10,8 @@ from starlette.middleware.base import BaseHTTPMiddleware
 
 from codessa_memory.di.container import Container, Lifetime, Scope
 from codessa_memory.ingest.pipeline import IngestionPipeline
+from codessa_memory.limits.http import RateLimitMiddleware
+from codessa_memory.limits.service import RateLimiter
 from codessa_memory.retrieval.service import RetrievalService
 from codessa_memory.storage.local_store import LocalStore
 from codessa_memory.utils.config import Settings, settings
@@ -65,6 +67,12 @@ def create_container(app_settings: Settings, overrides: Mapping[type[Any], Any] 
 
     container.register(RetrievalService, _retrieval, lifetime=Lifetime.SINGLETON)
 
+    container.register(
+        RateLimiter,
+        lambda _c, _s: RateLimiter(requests_per_minute=app_settings.rate_limit_requests_per_minute),
+        lifetime=Lifetime.SINGLETON,
+    )
+
     if overrides:
         container.apply_overrides(overrides)
 
@@ -82,7 +90,15 @@ def create_app(app_settings: Settings | None = None, overrides: Mapping[type[Any
 
     app = FastAPI(title=app_settings.app_name, lifespan=lifespan)
     app.state.container = container
+
+    public_prefixes = ("/health", "/docs", "/openapi.json", "/redoc")
     app.add_middleware(ScopeMiddleware)
+    app.add_middleware(
+        RateLimitMiddleware,
+        limiter=container.resolve(RateLimiter),
+        enabled=app_settings.rate_limit_enabled,
+        public_prefixes=public_prefixes,
+    )
 
     @app.get("/health")
     def health() -> dict[str, str]:

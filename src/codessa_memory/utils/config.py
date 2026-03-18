@@ -10,6 +10,9 @@ class Settings(BaseSettings):
     api_port: int = 8000
     log_level: str = "INFO"
 
+    rate_limit_enabled: bool = True
+    rate_limit_requests_per_minute: int = 60
+
     embedding_provider: str = "local"
     embedding_model: str = "sentence-transformers/all-MiniLM-L6-v2"
     openai_api_key: str = ""
