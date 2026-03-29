@@ -1,5 +1,4 @@
-# Codessa Memory Repo
-
+# Codessa Memory
 A production-oriented starter repository for the **Codessa Memory Layer (CML)**.
 
 It provides:
