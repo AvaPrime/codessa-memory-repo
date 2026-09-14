@@ -12,8 +12,15 @@ class IngestionPipeline:
         self.chunk_size = chunk_size
         self.overlap = overlap
 
-    def ingest_text(self, text: str, source: str = "manual", source_ref: str | None = None) -> list[CodexEntry]:
-        chunks = chunk_text(text, self.chunk_size, self.overlap)
+    def ingest_text(
+        self,
+        text: str,
+        source: str = "manual",
+        source_ref: str | None = None,
+        preserve_whitespace: bool = False,
+    ) -> list[CodexEntry]:
+        """Chunk, extract, embed, and store *text*."""
+        chunks = chunk_text(text, self.chunk_size, self.overlap, preserve_whitespace=preserve_whitespace)
         entries: list[CodexEntry] = []
         for chunk in chunks:
             extracted = heuristic_extract(chunk)
